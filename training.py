@@ -1,44 +1,66 @@
-import csv
+import sys
+from utils import read_csv_file
 
 
-def read_csv_file():
-    km = []
-    price = []
-    with open('data.csv', mode='r')as file:
-        csvFile = csv.reader(file)
-        for i, lines in enumerate(csvFile):
-            if i == 0:
-                continue
-            km.append(int(lines[0]))
-            price.append(int(lines[1]))
-    return {'km': km, 'price': price}
+def estimatePrice(mileage, theta0, theta1):
+    return theta0 + (theta1 * mileage)
 
 
-def mean(arr):
-    return sum(arr) / len(arr)
+def calcTheta0(x_data, y_data, theta0, theta1, learning_rate):
+    s = 0
+    for i in range(len(x_data)):
+        s += estimatePrice(x_data[i], theta0, theta1) - y_data[i]
+    return learning_rate * s / len(x_data)
 
 
-def calculateTheta():
-    theta0, theta1 = 0, 0
+def calcTheta1(x_data, y_data, theta0, theta1, learning_rate):
+    s = 0
+    for i in range(len(x_data)):
+        s += (estimatePrice(x_data[i], theta0, theta1) - y_data[i]) * x_data[i]
+    return learning_rate * s / len(x_data)
 
+
+def gradientDescent(x_data, y_data, theta0=0, theta1=0, iteration=0):
+    """this function calculate theta0 and theta1 using gradient descent
+
+    Returns:
+        [theta0, theta1]
+    """
+    learning_rate = 0.01
+    if iteration == 200:
+        return [theta0, theta1]
+
+    tmp_theta0 = calcTheta0(
+        x_data, y_data, theta0, theta1, learning_rate)
+    tmp_theta1 = calcTheta1(
+        x_data, y_data, theta0, theta1, learning_rate)
+
+    theta0 -= tmp_theta0
+    theta1 -= tmp_theta1
+
+    return gradientDescent(x_data, y_data, theta0, theta1, iteration + 1)
+
+
+def scaleData(data, scaler):
+    return [e * scaler for e in data]
+
+
+def main():
+    sys.setrecursionlimit(100000)
+
+    # read data from csv
     file_data = read_csv_file()
     x_data = file_data['km']
     y_data = file_data['price']
 
-    x_mean = mean(x_data)
-    y_mean = mean(y_data)
-    a, b = 0, 0
-    for i in range(len(x_data)):
-        a += (x_data[i] - x_mean) * (y_data[i] - y_mean)
-        b += (x_data[i] - x_mean)**2
-    theta1 = a / b
-    theta0 = y_mean - (theta1 * x_mean)
-    return [theta0, theta1]
+    # scale data down to avoid overflow
+    x_data = scaleData(x_data, 0.0001)
+    y_data = scaleData(y_data, 0.0001)
 
-
-def main():
-    theta = calculateTheta()
-    print(f"theta0: {theta[0]}")
+    # calculate thera using Gradiant descent
+    print("Gradiant descent: ")
+    theta = gradientDescent(x_data, y_data)
+    print(f"theta0: {theta[0] * 10000}")
     print(f"theta1: {theta[1]}")
 
 
