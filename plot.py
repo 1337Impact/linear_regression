@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from utils import read_csv_file
 
 
-def l_func(x, m, b):
-    return (x * m) + b
+def l_func(x, b, m):
+    return b + (x * m)
 
 
 def plotData(x_data, y_data):
@@ -13,7 +13,7 @@ def plotData(x_data, y_data):
     plt.title('Plot Data')
     plt.scatter(x_data, y_data, color='red', label='Data points')
 
-    y_slope = [l_func(x, -0.021448963591700208, 8499.59964993295)
+    y_slope = [l_func(x, 8499.59964993295, -0.021448963591700208)
                for x in x_data]
     plt.plot(x_data, y_slope, color='blue', label='Slope line')
 

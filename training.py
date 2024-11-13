@@ -27,7 +27,7 @@ def gradientDescent(x_data, y_data, theta0=0, theta1=0, iteration=0):
         [theta0, theta1]
     """
     learning_rate = 0.01
-    if iteration == 200:
+    if iteration == 20000:
         return [theta0, theta1]
 
     tmp_theta0 = calcTheta0(
